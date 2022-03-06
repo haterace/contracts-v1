@@ -16,7 +16,7 @@ contract RatSkins is Ownable, ERC721
     }
     mapping (uint256 => Skin) public  _skins;
     string                    public  _base;
-    uint256                   private _skinsCounter;
+    address                   public  _boss;
 
     constructor () ERC721("Hate Race", "Skins")
     {
@@ -32,14 +32,18 @@ contract RatSkins is Ownable, ERC721
     {
         return _base;
     }
-    
-    function createSkin(uint256 ratId, string memory hash) public onlyOwner returns(uint256)
+
+    function setBossAddress(address boss) public onlyOwner
     {
-        _skinsCounter += 1;
-        _safeMint(_msgSender(), _skinsCounter);
-        _skins[_skinsCounter].ratId = ratId;
-        _skins[_skinsCounter].hash = hash;
-        emit SkinCreated(_skinsCounter, ratId, hash);
-        return _skinsCounter;
+        _boss = boss;
+    }
+
+    function createSkin(uint256 ratId, uint256 skinId, string memory hash) public onlyOwner returns(uint256)
+    {
+        _safeMint(_boss == address(0) ? _msgSender() : _boss, skinId);
+        _skins[skinId].ratId = ratId;
+        _skins[skinId].hash = hash;
+        emit SkinCreated(skinId, ratId, hash);
+        return skinId;
     }
 }
